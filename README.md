@@ -40,8 +40,8 @@ Purchase these **3 parts**. Feel free to find cheaper alternatives on Amazon or 
     
     ![window opener parts](/media/parts.jpg)
 
-    * [**Excluding** 3D printed parts](https://valarsystems.com/products/automatic-window-opener?variant=39590892240955) ($99 USD)
-    * [**Including** 3D printed parts](https://valarsystems.com/products/automatic-window-opener?variant=39590892208187) ($139 USD)
+    * [**Excluding** 3D printed parts](https://valarsystems.com/products/s1-adjustable-curtain-opener?variant=39595200315451) ($79 USD)
+    * [**Including** 3D printed parts](https://valarsystems.com/products/s1-adjustable-curtain-opener?variant=395952002826837) ($99 USD)
 
 2. <a href="https://amzn.to/2Wc5Oh4" target="_blank">Stepper motor</a> ($8 USD)
     * NEMA 17
@@ -56,13 +56,9 @@ Purchase these **3 parts**. Feel free to find cheaper alternatives on Amazon or 
 
 ## How to 3D print it
 
-Your window might open **from** the left **to** the right, or it might open **from** the right **to** the left.
+Go to the repo folder "hardware" -> "Plastics" -> "platter"
 
-The only version available is the ability to open from right to left. The other version will be added later.
-
-Go to the repo folder "hardware" -> "Plastics" -> "open-left" -> "platters"
-
-These PrusaSlicer platters are set up to print. Otherwise just print the STLs individually (not recommended because print orientation is critical). 
+The PrusaSlicer platter is set up to print. Otherwise just print the STLs individually (not recommended because print orientation is critical). 
 
 ### Print Settings:
 * Use PETG **only**
@@ -72,11 +68,11 @@ These PrusaSlicer platters are set up to print. Otherwise just print the STLs in
 
 ## How to install it
 
-There are 2 mounts that are attached with adhesive. If necessary, you can also use a screw into the sill, but that has been required. 
+There is 1 mount that is attached with adhesive. If necessary, you can also use 2 screws with anchors into the wall, but that has been required. 
 
-First attach the window mount.
+First decide if you want to place it on the left or right side of the window.
 
-Next, attach the sill mount.
+Next, attach the wall mount.
 
 Wait 24 hours for the adhesives to set and you can now use the window opener.
 
@@ -86,8 +82,3 @@ Commands are sent via HTTP requests
 
 Follow the instructions outlined in the ![firmware](/firmware) folder.
 
-## Node-RED workflow
-
-Use Node-RED in Home Assistant to automate everything. Click the image below to watch a YouTube video on how it works.
-
-[![Youtube Link](/media/node-red-flow.jpg)](https://youtu.be/ou7uRED_ff0)
