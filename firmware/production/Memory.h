@@ -39,7 +39,6 @@ void load_preferences(){
   ssid = preferences.getString ("ssid", "NO_SSID");
   pass = preferences.getString ("pass", "NO_PASSWORD");
   max_steps = preferences.getInt("max_steps", 2000);
-  Serial.println(max_steps);
   current = preferences.getLong("current", 400);
   accel = preferences.getInt("accel", 100);
   max_speed = preferences.getInt("max_speed", 100);
