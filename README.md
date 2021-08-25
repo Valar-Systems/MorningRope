@@ -27,13 +27,11 @@ This only works on backtab curtains that looks like this. Be sure you own or pur
 
 We've created a hardware kit that includes everything. You may optionally 3D print your parts or purchase them seperately.
 
-* Kit price: $99 USD
-* Total filament costs: ~$4 USD
-* Total print time: ~12 hours (You can also purchase the 3D prints for $20 USD)
+* Total print time: ~12 hours (You can also purchase the 3D prints)
 * Total assembly time: ~20 minutes
 
-    * [**Excluding** 3D printed parts](https://valarsystems.com/products/s1-adjustable-curtain-opener?variant=39595200315451) ($99 USD)
-    * [**Including** 3D printed parts](https://valarsystems.com/products/s1-adjustable-curtain-opener?variant=395952002826837) ($119 USD)
+    * [**Excluding** 3D printed parts](https://valarsystems.com/products/s1-adjustable-curtain-opener?variant=39595200315451)
+    * [**Including** 3D printed parts](https://valarsystems.com/products/s1-adjustable-curtain-opener?variant=395952002826837)
 
 ![window opener parts](/media/kit-parts.jpg)
 
