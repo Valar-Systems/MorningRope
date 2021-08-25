@@ -20,6 +20,8 @@ Before you get too excited and buy/build this, please be sure it will work on yo
 
 This only works on backtab curtains that looks like this. Be sure you own or purchase curtains like this.
 
+Why? The reason for using backtab curtains is due to thier low friction. If using grommets, the friction between the rod and grommet gets too high for the device to move. This is because the motor is pulling on the string, so if there's too much friction on the rod and grommets, the string will slip. Backtabs have proven to work for lengths up to 140" so I stick with them. Short runs will work for grommets but it's not reliable.
+
 ![window opener GIF](/media/backtab-example.jpg)
 
 
