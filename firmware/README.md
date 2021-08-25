@@ -15,7 +15,7 @@ Note: This is an access point which means you will connect directly to the devic
 
 You are now connected to the device and can begin to control the motor directly.
 
-## Step 3 - Add Model-H to your network
+## Step 3 - Add Model-S to your network
 It's best to add this device to your network so you do not need to connect to it directly.
 1. To do so, go to http://192.168.4.1/wifi
 2. Enter in the name and password of your Wi-Fi router. Your device will now connect to your router.
@@ -25,7 +25,7 @@ It's best to add this device to your network so you do not need to connect to it
 6. You should now be connected to the device.
 7. To reset the name and password that is stored in the device, press and hold the small Wi-Fi reset button that is to the left of the power plug for over 3 seconds. You should now see the VALAR-AP network again.
 
-## Step 4 - Control your Model-H
+## Step 4 - Control your Model-S
 1. Set the distance, in inches, that your motor should move in order to open your curtains all the way
 2. Under the "Position" section, enter a value of 50 and click "Set Position". The motor should begin moving to the 50 percent position.
 3. You can also manually set motor parameters by modifying the following values:
