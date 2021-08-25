@@ -10,7 +10,7 @@ The motor is attached to your wall just behind one of the curtains
 
 ![window opener GIF](/media/motor-gif.gif)
 
-There is a carriage attached to the front of each curtain panel. A string runs through each carriage and through the motor which pulls it open and close.
+There is a carriage attached to the back of each curtain panel. A string runs through each carriage and through the motor which pulls it open and close.
 
 ![window opener GIF](/media/string-gif.gif)
 
@@ -25,7 +25,7 @@ This only works on backtab curtains that looks like this. Be sure you own or pur
 
 ## How to build it
 
-We've created a hardware kit that includes everything. You may optionally 3D print your parts or purchase them seperately.
+We've created a hardware kit that includes everything. If you source the parts individually, it will cost 5X more just because all of the hardware need to purchased in bulk from places like McMaster-Carr. You may optionally 3D print your parts.
 
 * Total print time: ~12 hours (You can also purchase the 3D prints)
 * Total assembly time: ~20 minutes
