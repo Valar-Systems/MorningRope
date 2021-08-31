@@ -14,6 +14,14 @@ There is a carriage attached to the back of each curtain panel. A string runs th
 
 ![window opener GIF](/media/string-gif.gif)
 
+At the heart of the device is our custom PCB which uses an ESP32 and Trinamic TMC2209 stepper driver. 
+
+The motor is dead silent.
+
+If a stall occurs, the advanced TMC2209 will detect the increased back-EMF from the motor and stop it automatically, like magic.
+
+![window opener](/media/model-s-pcb.jpg)
+
 ## Will it work on your curtains?
 
 Before you get too excited and buy/build this, please be sure it will work on your curtains. The type of curtains you have is very important.
@@ -42,17 +50,10 @@ We've created a hardware kit that includes everything. If you source the parts i
 
 Go to the repo folder "hardware" -> "Plastics" -> "platter"
 
-The PrusaSlicer platter is set up to print. Otherwise just print the STLs individually (not recommended because print orientation is critical). 
-
-### Print Settings:
-* Use PETG **only**
-* 0.25 mm layer height
-* In PrusaSlicer go to "Print Settings" -> "Seam position" -> set to "Rear"
-
 
 ## How to install it
 
-There is 1 mount that is attached with adhesive. If necessary, you can also use 2 screws with anchors into the wall, but that has been required. 
+There is a mount that is attached with adhesive. If necessary, you can also use 2 screws with anchors into the wall, but that has been required. 
 
 First decide if you want to place it on the left or right side of the window.
 
