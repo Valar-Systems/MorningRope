@@ -32,8 +32,8 @@ We've created a hardware kit that includes everything. If you source the parts i
 * Total print time: ~12 hours (You can also purchase the 3D prints)
 * Total assembly time: ~20 minutes
 
-    * [**Excluding** 3D printed parts](https://valarsystems.com/products/s1-adjustable-curtain-opener?variant=39595200315451)
-    * [**Including** 3D printed parts](https://valarsystems.com/products/s1-adjustable-curtain-opener?variant=395952002826837)
+1. [This kit **excludes** 3D printed parts](https://valarsystems.com/products/s1-adjustable-curtain-opener?variant=39595200315451)
+2. [This kit **Includes** 3D printed parts](https://valarsystems.com/products/s1-adjustable-curtain-opener?variant=395952002826837)
 
 ![window opener parts](/media/kit-parts.jpg)
 
