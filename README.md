@@ -53,7 +53,7 @@ Go to the repo folder "hardware" -> "Plastics" -> "platter"
 
 ## How to install it
 
-There is a mount that is attached with adhesive. If necessary, you can also use 2 screws with anchors into the wall, but that has been required. 
+There is a mount that is attached with adhesive. If necessary, you can also use 2 screws with anchors into the wall, but that has not been required. 
 
 First decide if you want to place it on the left or right side of the window.
 
