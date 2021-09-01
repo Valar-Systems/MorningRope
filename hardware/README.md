@@ -5,16 +5,55 @@ To assemble the 3D printed parts, click the image below to watch the YouTube set
 [![Youtube Link](/media/model-s-build-cover.jpg)](https://youtu.be/D2XbAFMFN6s)
 
 
-# Hardware Setup Guide
+# Wall Mounting Guide
 
-Tip: Connect your MorningRope to your network and test that everything works well before proceeding with attaching hardware.
+These instructions will explain how to install the devcice onto your curtains. 
 
-## 1.Pick Side
+## 1. Test electronics
+
+We need to test the motor and make sure everything is working fine before attaching to your curtains. 
+
+### a. Plug in power
+Plug in 12V (2A+) power cord.
+
+### b. Clear the WiFi
+Let's make sure that no wifi name and password is saved into the device. This could have happened when we tested it during manufacturing. 
+
+Press and hold the wifi reset button for 5 full seconds.
+
+There are 2 buttons, so be sure to press the correct one.
+
+![Double Pulley](/media/wifi-reset.jpg)
+
+### c. Connect to wifi
+Using your phone, tablet, or laptop, search for a new WiFi network called "VALAR-AP"
+
+Connect to it using the password "password"
+
+In your phones (or tablet or laptops) browser (Chrome, Firefox, etc.), go to the web page "http://192.168.4.1"
+
+### d. Test movement
+Under the "Position", enter a value of "100" and press "Set Position"
+
+The motor should now turn.
+
+Now enter "0" and "Set Position"
+
+The motor should turn in the opposite direction
+
+### e. Add to network
+It's recommened that you add this device to your network. To do so, connect back to "VALAR-AP" and go to http://192.168.4.1/wifi
+
+Enter your wifi credentials. 
+
+Now use a network scanning tool to find the IP address of your new device and connect to it by entering this IP address into your browser.
+
+## 2.Pick Side
 
 Begin by determinng which side of the window you want the motor to be on. Look for the closest available power outlet and try to be near it. 
 
 
-## 2. Attach Pulleys
+## 3. Attach Pulleys
 
 You will have 2 pulley that have a zip tie. There is a single pulley and a double pulley. 
 
@@ -26,7 +65,7 @@ Attach the **single pulley** to the curtain rod wall brack on the **opposite end
 
 
 
-## 3. Attach Carriages
+## 4. Attach Carriages
 
 You will have two carriages. 
 
@@ -41,7 +80,7 @@ Place the backtab into the clamping mechanism. Insert a 25mm hex head screw into
 ![carriage](/media/carriage2.jpg)
 
 
-## 4. Run String
+## 5. Run String
 
 With both pulleys attached and both carriages attached, we can now run the string through all of them.
 
@@ -67,7 +106,7 @@ Be sure to move as much of the string through the double pulley, where is will h
 Do not tighten the single screw, we will need to adjust the position of the curtain before tightening it down. 
 :::
 
-## 5. Wall Plate
+## 6. Wall Plate
 
 Once the string is properly run, we can attach the wall-plate to the wall. 
 
@@ -91,7 +130,7 @@ The motor should now be attached like this. Use a M3 serrated flange nut to secu
 
 ![carriage](/media/wall_plate_attached.jpg)
 
-## Attaching the string
+## 7. Attaching the string
 
 remove the screw from the clamps. Notice that the screw may be placed into either direction. Because sure that the nut inside the clamp is on the **opposite** end from the screw head. 
 
@@ -109,7 +148,7 @@ Undo one of the screws with the orange arrow and tighten up the string so it is 
 Do not try to move the curtains by hand. Only pull on the string directly above the motor. Always pull **up and away** from the motor.
 :::
 
-## Adjust position of curtains
+## 8. Adjust position of curtains
 
 One of the curtains should be connected to the string on both ends, and the other should glide along the string (blue arrow above) because we have not tightened down this screw yet. 
 
@@ -118,3 +157,11 @@ Pull on the string and move it so the panel that is attached to it is in the cen
 Next, pull the curtain panel that is not attached and move it so it so both curtains are in the center and touching. Tighten the blue arrow screw.
 
 Both curtains should now be attached to the string and open/close together. 
+
+## 9. Reset home position
+
+Once the curtains are both in the center, open up the browser settings and press the "Set Zero" button located at the very bottom of the page
+
+## 10. Adjust motor parameters
+
+COMING SOON
