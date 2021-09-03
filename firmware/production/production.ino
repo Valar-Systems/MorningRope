@@ -1,3 +1,8 @@
+/*
+ * MODEL-S Curtain Opener
+ * By Daniel Frenkel
+ */
+
 #include <Arduino.h>
 #include <AccelStepper.h>
 #include <HardwareSerial.h>
