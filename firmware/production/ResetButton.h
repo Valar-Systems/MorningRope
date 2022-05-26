@@ -1,4 +1,4 @@
-#define WIFI_PIN 4 
+#define WIFI_PIN 4
 
 volatile bool     g_buttonPressed = false;
 volatile uint32_t g_buttonPressTime = -1;
@@ -27,7 +27,7 @@ void button_change(void)
     g_buttonPressed = false;
     uint32_t buttonHoldTime = millis() - g_buttonPressTime;
     if (buttonHoldTime >= 3000) {
-    button_action();
+      button_action();
     }
     g_buttonPressTime = -1;
   }

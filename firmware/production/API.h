@@ -4,219 +4,164 @@
 #include "AsyncJson.h"
 #include "ArduinoJson.h"
 
-const char *ap_ssid = "VALAR-AP";
-const char *ap_password = "password";
+Timezone myTZ;
+
+time_t newOpenTime;
+time_t newCloseTime;
 
 String ip_address;
+String hostname = "val-1000";
 
-AsyncWebServer server(80);
+AsyncWebServer serverAPI(8080);
 
-const char WIFI_HTML[] = "Enter your home Wifi Name and Password <br> <br> <form action=\"/set_wifi\">\n    <label class=\"label\">Network Name</label>\n    <input type = \"text\" name = \"ssid\"/>\n    <br/>\n    <label>Network Password</label>\n    <input type = \"text\" name = \"pass\"/>\n    <br/>\n    <input type=\"submit\" value=\"Set Values\">\n</form>";
-const char SETTINGS_HTML[] = "<h2>Valar Systems</h2>\n<h3>Motion Control</h3>\n<p>To learn more, please visit <a href=\"https://help.valarsystems.com/docs/VAL-1000/VAL-1000\">https://help.valarsystems.com</a></p>\n<p>To add this device to your network <a href=\"http://192.168.4.1/wifi\">go to http://192.168.4.1/wifi</a></p>\n<p>To remove this device from your network, press and hold the wifi reset button for 3+ seconds.</p>\n<br> \n<h2>Position</h2>\n<form action=\"/position\">\n    <p>Enter a value from 0-100. This is the percent of the max_steps value to move the motor.</p>\n    <label><b>move_to :</b></label>\n    <input value = \"%PLACEHOLDER_PERCENT%\" type = \"text\" name = \"move_percent\"/>\n    <br/>\n    <input type=\"submit\" value=\"Set Position\">\n    <p>You can also send an HTTP request to http://%PLACEHOLDER_IP_ADDRESS%/position?move_percent=%PLACEHOLDER_PERCENT%</p>\n</form>\n<br>\n<h2>Motor Parameters</h2>\n<form action=\"/set_motor\">\n    <p>Enter a value from 400-2000. This is the amount of RMS current the motor will draw.</p>\n    <label><b>current</b></label>\n    <input value = \"%PLACEHOLDER_CURRENT%\" type = \"text\" name = \"current\"/>\n    <p>You can also send an HTTP request to http://%PLACEHOLDER_IP_ADDRESS%/set_motor?current=%PLACEHOLDER_MAX_STEPS%</p>\n    <br/>\n    <p>Enter a stall value from 0-255. The higher the value, the easier it will stall.</p>\n    <label><b>stall</b></label>\n    <input value = \"%PLACEHOLDER_STALL%\" type = \"text\" name = \"stall\"/>\n    <p>You can also send an HTTP request to http://%PLACEHOLDER_IP_ADDRESS%/set_motor?stall=%PLACEHOLDER_STALL%</p>\n    <br/>\n        <input type=\"submit\" value=\"Set Parameters\">\n<p>To set all values at once, send an HTTP request to http://%PLACEHOLDER_IP_ADDRESS%/set_motor?max_steps=%PLACEHOLDER_MAX_STEPS%&amp;current=%PLACEHOLDER_CURRENT%&stall=%PLACEHOLDER_STALL%&accel=%PLACEHOLDER_ACCEL%&max_speed=%PLACEHOLDER_MAX_SPEED%</p>\n</form>\n<br>\n<br>\n<p>Press this button to set the home position of your motor to zero</p>\n<form action=\"/set_zero\">\n<input type=\"hidden\" name=\"set_zero\" value=\"1\" />\n<input type=\"submit\" value=\"set_zero\">\n</form>";
-String processor(const String& var)
-{
- 
-  if(var == "PLACEHOLDER_PERCENT"){
-    return String(move_percent);
-  }
-  else if(var == "PLACEHOLDER_MAX_STEPS"){
-    return String(max_steps);
-  }
-  else if(var == "PLACEHOLDER_CURRENT"){
-    return String(current);
-  }
-  else if(var == "PLACEHOLDER_STALL"){
-    return String(stall);
-  }
-  else if(var == "PLACEHOLDER_ACCEL"){
-    return String(accel);
-  }
-  else if(var == "PLACEHOLDER_MAX_SPEED"){
-    return String(max_speed);
-  }
-  else if(var == "PLACEHOLDER_IP_ADDRESS"){
-    return String(ip_address);
-  }
- 
-  return String();
+void scheduleOpen() {
+
+  Serial.println("Schedule Open Executed");
+
+  // start motor!
+  move_to_step = max_steps;
+  run_motor = true;
+
+  // set next time to wakeup
+  openEvent = myTZ.setEvent(scheduleOpen, myTZ.now() + 24 * 3600);
+
+  Serial.println("Schedule Open Complete");
 }
 
-void API()
-{
-    //Preferences library create varaiable to save
-  Serial.print("wifi_set: ");
-  Serial.println(wifi_set);
-  
-  if (wifi_set == 0) 
+void scheduleClose() {
+
+  Serial.println("Schedule Close Executed");
+
+  // do the alarm thing!
+  move_to_step = 0;
+  run_motor = true;
+
+  // set next time to wakeup
+  closeEvent = myTZ.setEvent(scheduleClose, myTZ.now() + 24 * 3600);
+
+  Serial.println("Schedule Close Complete");
+}
+
+
+
+void startezTime() {
+
+  if (WiFi.status() == WL_CONNECTED && (open_timer == 1 || close_timer == 1))
   {
-  WiFi.softAP(ap_ssid, ap_password);
-  Serial.print("IP address: ");
-  Serial.println(WiFi.softAPIP());
-  ip_address = WiFi.softAPIP().toString();
+    vTaskDelay(2000);
+    setDebug(INFO);
+    waitForSync();
+
+    Serial.println();
+    Serial.println("UTC: " + UTC.dateTime());
+
+    myTZ.setLocation(MYTIMEZONE);
+    Serial.print("Time in your set timezone: ");
+    Serial.println(myTZ.dateTime());
+
+    // determine open time
+    newOpenTime = makeTime(open_hour, open_minute, 0, myTZ.day(), myTZ.month(), myTZ.year());
+    if (myTZ.now() >= newOpenTime) newOpenTime += 24 * 3600;
+
+    // set next time to wakeup
+    openEvent = myTZ.setEvent(scheduleOpen, newOpenTime);
+
+    // determine close time
+    newCloseTime = makeTime(close_hour, close_minute, 0, myTZ.day(), myTZ.month(), myTZ.year());
+    if (myTZ.now() >= newCloseTime) newCloseTime += 24 * 3600;
+
+    // set next time to wakeup
+    closeEvent = myTZ.setEvent(scheduleClose, newCloseTime);
+
   }
-  else if (wifi_set == 1)
-  {
+}
+
+void connectWifi() {
   WiFi.softAPdisconnect(true);
   Serial.println(ssid);
   Serial.println(pass);
   WiFi.mode(WIFI_STA);
+  WiFi.config(INADDR_NONE, INADDR_NONE, INADDR_NONE, INADDR_NONE);
+  WiFi.setHostname(hostname.c_str());
   WiFi.begin(ssid.c_str(), pass.c_str());
 
-      while (WiFi.status() != WL_CONNECTED) {
-            delay(500);
-            Serial.print(".");
-        }
-        
+  while (WiFi.status() != WL_CONNECTED) {
+    vTaskDelay(1000);
+    Serial.print(".");
+
+    if (wifi_button == true)
+    {
+      Serial.println("Wifi Pressed");
+      button_change();
+      wifi_button = false;
+    }
+  }
+
   Serial.println(WiFi.localIP());
   ip_address = WiFi.localIP().toString();
+}
+
+void API()
+{
+
+  Serial.print("wifi_set: ");
+  Serial.println(wifi_set);
+
+  uint32_t chipid = 0;
+  for (int i = 0; i < 17; i = i + 8)
+  {
+    chipid |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
   }
-  
-  server.on("/wifi", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(200, "text/html", WIFI_HTML);
-  });
+  char ap_ssid[25];
+  snprintf(ap_ssid, 26, "VALAR-AP-%08X", chipid);
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send_P(200, "text/html", SETTINGS_HTML, processor);
-  });
 
-  server.on("/set_wifi", HTTP_GET, [] (AsyncWebServerRequest *request) {
-    
-  if (request->hasParam("ssid")) {
-      ssid = request->getParam("ssid")->value().c_str();
-      preferences.putString ("ssid", ssid);
-      Serial.print("ssid: ");
-      Serial.println(ssid);
-      Serial.print("ssid preferences: ");
-      Serial.println(preferences.getString ("ssid", "NO_SSID"));
-    }
-    
-  if (request->hasParam("pass")) {
-      pass = request->getParam("pass")->value().c_str();
-      preferences.putString ("pass", pass);
-      wifi_set = 1;
-      preferences.putInt ("wifi_set", 1);
-      
-      Serial.println(pass);
-      Serial.println(preferences.getString ("pass", "NO_PASSWORD"));
-      
-      request->send(200, "text/html", "WiFi Credentials Set. Connect to your home WiFi network, find the IP address of this device, and go to http://NEW-IP-ADDRESS");
-      WiFi.softAPdisconnect(true);
-      delay(500);
-      WiFi.begin(ssid.c_str(), pass.c_str());  
+  if (wifi_set == 0)
+  {
+    WiFi.softAP(ap_ssid);
+    Serial.print("IP address: ");
+    Serial.println(WiFi.softAPIP());
+    ip_address = WiFi.softAPIP().toString();
+  }
+  else if (wifi_set == 1)
+  {
+    connectWifi();
+  }
 
-    }
-                                  
-  });
 
-  server.on("/set_motor", HTTP_GET, [](AsyncWebServerRequest *request){
-    
-    int paramsNr = request->params();
-    Serial.print("Params: ");
-    Serial.println(paramsNr);
- 
-    for(int i=0;i<paramsNr;i++){
-        AsyncWebParameter* p = request->getParam(i);
-    }
-    
-    if(request->hasParam("max_steps"))
-        {
-          max_steps = request->getParam("max_steps")->value().toInt();
-          preferences.putInt ("max_steps", max_steps);
-          Serial.print("max_steps: ");
-          Serial.println(max_steps);
-        }
-    if(request->hasParam("current"))
-        {
-          current = request->getParam("current")->value().toInt();
-          driver.rms_current(current); 
-          preferences.putInt ("current", current);
-          Serial.print("current: ");
-          Serial.println(current);
-        }
-    if(request->hasParam("stall"))
-        {
-          stall = request->getParam("stall")->value().toInt();
-          driver.SGTHRS(stall);
-          preferences.putInt ("stall", stall);
-          Serial.print("stall: ");
-          Serial.println(stall);
-        }
-    if(request->hasParam("accel"))
-        {
-          accel = request->getParam("accel")->value().toInt();
-          stepper.setAcceleration(accel);
-          preferences.putInt ("accel", accel);
-          Serial.print("accel: ");
-          Serial.println(accel);
-        }
-    if(request->hasParam("max_speed"))
-        {
-          max_speed = request->getParam("max_speed")->value().toInt();
-          stepper.setMaxSpeed(max_speed);
-          preferences.putInt ("max_speed", max_speed);
-          Serial.print("max_speed: ");
-          Serial.println(max_speed);
-        }
-
-    request->redirect("/");
-    
-  });
-
-server.on("/set_zero", HTTP_GET, [](AsyncWebServerRequest *request){
+  serverAPI.on("/position", HTTP_GET, [](AsyncWebServerRequest * request) {
 
     int paramsNr = request->params();
- 
-    for(int i=0;i<paramsNr;i++){
-        AsyncWebParameter* p = request->getParam(i);
+
+    for (int i = 0; i < paramsNr; i++) {
+      AsyncWebParameter* p = request->getParam(i);
     }
 
-    set_zero = 1;
-    Serial.print("set_zero: ");
-    Serial.println(set_zero);   
-    request->redirect("/");
-  
-  });
-
-server.on("/position", HTTP_GET, [](AsyncWebServerRequest *request){
-    
-    int paramsNr = request->params();
-  
-    for(int i=0;i<paramsNr;i++){
-        AsyncWebParameter* p = request->getParam(i);
-    }
-
-    if(request->hasParam("move_percent"))
+    if (request->hasParam("move_to_percent"))
     {
-        move_percent = request->getParam("move_percent")->value().toInt();
-        move_to = (max_steps/100)*move_percent;
-        stepper.moveTo(move_to);
-        Serial.print("max_steps: ");
-        Serial.println(max_steps); 
-        Serial.print("move_percent: ");
-        Serial.println(move_percent); 
-        Serial.print("move_to: ");
-        Serial.println(move_to); 
-        run_motor=true;
-    }  
-
-    request->redirect("/");
-  
+      move_to_percent = request->getParam("move_to_percent")->value().toInt();
+      move_to_step = (max_steps / 100) * move_to_percent;
+      Serial.print("move_to_percent: ");
+      Serial.println(move_to_percent);
+      Serial.print("move_to_step: ");
+      Serial.println(move_to_step);
+      run_motor = true;
+    }
+    request->send(200, "text/html", "Great Success");
   });
 
-server.on("/settings", HTTP_GET, [](AsyncWebServerRequest *request){
 
-DynamicJsonDocument doc(100);
-doc["percent_position"] = int(((float)stepper.currentPosition()/(float)max_steps)*100);
-doc["steps_position"] = stepper.currentPosition();
-doc["max_steps"] = max_steps;
-doc["current"] = current;
-doc["stall"] = stall;
+  serverAPI.on("/settings", HTTP_GET, [](AsyncWebServerRequest * request) {
 
-String json;
-serializeJson(doc, json);
+    DynamicJsonDocument doc(2048);
+    doc["position"] = stepper->getCurrentPosition();
 
-request->send(200, "application/json", json);
-});
+    String json;
+    serializeJson(doc, json);
 
-  server.begin();
+    request->send(200, "application/json", json);
+  });
+
+
+  serverAPI.begin();
 }
