@@ -20,7 +20,7 @@ The motor is dead silent.
 
 If a stall occurs, the advanced TMC2209 will detect the increased back-EMF from the motor and stop it automatically, like magic.
 
-![window opener](/media/-s-pcb.jpg)
+![window opener](/media/model-s-pcb.jpg)
 
 ## Will it work on your curtains?
 
