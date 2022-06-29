@@ -186,7 +186,7 @@ void setup_motors() {
   driver.mstep_reg_select(true);
   driver.rms_current(current);
   driver.SGTHRS(stall);
-  driver.microsteps(64);
+  driver.microsteps(motor_microsteps);
   driver.TCOOLTHRS(tcools); //
   driver.TPWMTHRS(0);
   driver.semin(0);

@@ -8,7 +8,8 @@ int current;
 int stall;
 int accel;
 int max_speed;
-int tcools;
+int tcools = (3089838.00 * pow(float(max_speed), -1.00161534)) * 1.5;
+int motor_microsteps = 64;
 int move_to_step = 0;
 int move_to_percent = 0;
 int set_zero = 0; // Set to 1 to set home position
@@ -59,9 +60,9 @@ void load_preferences() {
   stall = preferences.getInt("stall", 10);
   accel = preferences.getInt("accel", 10000);
   max_speed = preferences.getInt("max_speed", 30000);
-  tcools = (3089838.00 * pow(float(max_speed), -1.00161534)) * 1.5;
   open_direction =  preferences.getInt("open_dir", 0);
-
+  
+  
   open_timer = preferences.getInt("open_timer", 0);
   close_timer = preferences.getInt("close_timer", 0);
   open_hour = preferences.getInt("open_hour", 12);
