@@ -1,5 +1,5 @@
-# VAL-1000 HTTP Server Firmware
-## Getting Started with the VAL-1000
+# VAL-2000 HTTP Server Firmware
+## Getting Started with the VAL-2000
 
 This firmware will get you started with spinning the VAL-1000 WiFi stepper board.
 
@@ -44,7 +44,10 @@ Install the ESP32 core by following the instructions [here](https://randomnerdtu
 
 Install the following libriaires inside Arduino
 1. [TMC Stepper](https://www.arduino.cc/reference/en/libraries/tmcstepper/)
-2. [AccelStepper](https://www.arduino.cc/reference/en/libraries/accelstepper/)
+2. [FastAccelStepper](https://www.arduino.cc/reference/en/libraries/fastaccelstepper/)
+3. [ezTime](https://www.arduino.cc/reference/en/libraries/eztime/)
+4. [ESPUI](https://github.com/s00500/ESPUI)
+5. [ArduinoJson](https://www.arduino.cc/reference/en/libraries/arduinojson/)
 
 Install the following libraries outside Arduino. These cannot be installed using the Arduino library manager.
 1. [ESPAsyncWebServer](https://github.com/me-no-dev/ESPAsyncWebServer)
@@ -75,9 +78,9 @@ Upload the firmware to your board.
 
 ## Step 4 - Connect to board as Access Point
 
-Using your smart phone or laptop (or any device with wifi), look for the wifi network name VALAR-AP
+Using your smart phone or laptop (or any device with wifi), look for the wifi network name VALAR-AP-XXXXXXXX
 
-Connect to VALAR-AP
+Connect to VALAR-AP-XXXXXXXX
 
 This is an access point which means you will connect directly to the device and will lose you internet connection.
 
@@ -134,10 +137,8 @@ Pressing this button will set the position of the device back to 0.
 
 ## Step 7 - Control via API
 
-You may want to set up some automations to control your device. To trigger the motor to move, simply send this HTTP command via your browser or preferred method:
+You may want to set up some automations to control your device. To trigger the motor to move, simply send an HTTP command via your browser or preferred method.
 
-http://YOUR-IP-ADDRESS/position?move_percent=0
-
-Replace YOUR-IP-ADDRESSS with your actual IP address such as 192.168.0.56
+Go to the API tab to find the exact address to send the commands to.
 
 Replace the "0" with a value of 0-100 to set the position.
