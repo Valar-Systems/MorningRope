@@ -18,7 +18,7 @@ At the heart of the device is our custom PCB which uses an ESP32 and Trinamic TM
 
 The motor is dead silent.
 
-If a stall occurs, the advanced TMC2209 will detect the increased back-EMF from the motor and stop it automatically, like magic.
+If a stall occurs, the advanced TMC2209 will detect the reduced back-EMF from the motor and stop it automatically, like magic.
 
 ![window opener](/media/model-s-pcb.jpg)
 
