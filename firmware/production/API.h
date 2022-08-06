@@ -10,7 +10,7 @@ time_t newOpenTime;
 time_t newCloseTime;
 
 String ip_address;
-String hostname = "val-1000";
+String hostname = "MorningRope";
 
 AsyncWebServer serverAPI(8080);
 
