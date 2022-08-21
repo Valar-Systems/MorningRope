@@ -10,6 +10,7 @@
 #include "ResetButton.h"
 #include "MotorControl.h"
 #include "API.h"
+#include <EEPROM.h>
 #include "ESPUI.h"
 
 void setup() {

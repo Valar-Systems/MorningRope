@@ -9,6 +9,10 @@ String display_wifi;
 char openTimeDis[50];
 char closeTimeDis[50];
 
+//Function Prototypes
+void textCallback(Control *sender, int type);
+void enterWifiDetailsCallback(Control *sender, int type);
+
 
 void selectOpenAmPmCall(Control* sender, int value) //Dropdown
 {
@@ -336,6 +340,9 @@ void switchCloseScheduleCall(Control* sender, int value)
   }
 }
 
+
+
+/*
 void textNetworkCall(Control* sender, int type)
 {
   //    ssid = sender->value;
@@ -350,8 +357,16 @@ void textPasswordCall(Control* sender, int type)
   //    Serial.print(pass);
 }
 
-void buttonSaveNetworkCall(Control* sender, int type)
+*/
+
+void textCallback(Control *sender, int type) {
+  //This callback is needed to handle the changed values, even though it doesn't do anything itself.
+}
+
+
+void enterWifiDetailsCallback(Control* sender, int type)
 {
+ 
   if (type == B_UP) {
     Serial.println("Button Pressed");
     ssid = ESPUI.getControl(wifi_ssid_text)->value;
@@ -948,6 +963,8 @@ void ESPUIsetup() {
   ESPUI.addControl(ControlType::Option, "AM", "AM", ControlColor::None, closeTime);
   ESPUI.addControl(ControlType::Option, "PM", "PM", ControlColor::None, closeTime);
 
+
+
   //Tab4: WiFi
   ESPUI.addControl(ControlType::Separator, "Wifi Status", "", ControlColor::None, tab4);
   //Label: Is wifi set?
@@ -967,6 +984,8 @@ void ESPUIsetup() {
   //Text: Name
 
 
+
+  /*
   ESPUI.addControl(ControlType::Separator, "Set Wifi", "", ControlColor::None, tab4);
   wifi_ssid_text = ESPUI.addControl(ControlType::Text, "Network", ssid, ControlColor::Emerald, tab4, &textNetworkCall);
 
@@ -975,6 +994,19 @@ void ESPUIsetup() {
 
   //Button: Save
   ESPUI.addControl(ControlType::Button, "Save Settings", "SAVE", ControlColor::Emerald, tab4, &buttonSaveNetworkCall);
+
+*/
+
+  wifi_ssid_text = ESPUI.addControl(Text, "SSID", "", Alizarin, tab4, textCallback);
+  //Note that adding a "Max" control to a text control sets the max length
+  ESPUI.addControl(Max, "", "32", None, wifi_ssid_text);
+  wifi_pass_text = ESPUI.addControl(Text, "Password", "", Alizarin, tab4, textCallback);
+  ESPUI.addControl(Max, "", "64", None, wifi_pass_text);
+  
+  ESPUI.addControl(Text, "Re-Enter Password", "", Alizarin, tab4, textCallback);
+
+  ESPUI.addControl(Button, "Save", "Save", Peterriver, tab4, enterWifiDetailsCallback);
+
 
   //Tab5: API
   char apiPosition[50];
