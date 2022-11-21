@@ -1,3 +1,6 @@
+## New Book!!
+I've written a short book to teach you how to program this Trinamic stepper motor. It can be found on [Amazon here](https://amzn.to/3VdUWrN)
+
 # MorningRope: Automated Curtain Opener
 
 The MorningRope is a smart curtain opener that uses two buttons and HTTP requests to open and close your curtain. Combine it with Node-RED, Home Assistant (via ESPhome), or any other system capable of sending HTTP requests and get your curtain to open and close automatically.
