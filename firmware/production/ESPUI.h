@@ -8,8 +8,8 @@ uint16_t accelMax;
 String display_wifi;
 
 //Function Prototypes
-void textCallback(Control *sender, int type);
-void enterWifiDetailsCallback(Control *sender, int type);
+//void textCallback(Control *sender, int type);
+//void enterWifiDetailsCallback(Control *sender, int type);
 
 void numberMaxStepsCall(Control* sender, int type)
 {

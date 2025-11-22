@@ -83,7 +83,7 @@ void IRAM_ATTR index_interrupt(void) {
   current_position = motor_position;
 }
 
-int getCurrentPosition(){
+int getCurrentPosition() {
 
   return current_position;
 }
@@ -114,8 +114,8 @@ void goHome() {
 }
 
 /* Function that commands motor to move to position */
-esp_err_t sliding_window::move_to_percent100ths(uint16_t percent100ths, bool ignoreStall) {
-  ESP_LOGE(TAG, "move_to_percent100ths(): %i", percent100ths);
+void move_to_percent100ths(uint16_t percent100ths) {
+  printf("move_to_percent100ths(): %i", percent100ths);
 
   switch (percent100ths) {
     case 0:
@@ -131,24 +131,23 @@ esp_err_t sliding_window::move_to_percent100ths(uint16_t percent100ths, bool ign
 
   // Only use target steps if calibrated
   if (target_position == motor_position) {
-    ESP_LOGE(TAG, "Not moving the window because it is already at the desired position");
-    ESP_LOGE(TAG, "target_position: %li", target_position);
-    ESP_LOGE(TAG, "motor_position: %li", motor_position);
-    return ESP_ERR_INVALID_STATE;
+    printf(TAG, "Not moving the window because it is already at the desired position");
+    printf(TAG, "target_position: %li", target_position);
+    printf(TAG, "motor_position: %li", motor_position);
+    return;
   } else if (target_position > motor_position || percent100ths == 10000) {
     if (gpio_get_level(CLOSE_LIMIT_SWITCH_PIN) == LIMIT_SWITCH_PRESSED) {
-      ESP_LOGE(TAG, "Can't move the window because it is already closed");
-      return ESP_ERR_INVALID_STATE;
+      printf("Can't move the window because it is already closed");
+      return;
     }
     move_close();
   } else if (target_position < motor_position || percent100ths == 0) {
     if (gpio_get_level(OPEN_LIMIT_SWITCH_PIN) == LIMIT_SWITCH_PRESSED) {
-      ESP_LOGE(TAG, "Can't move the window because it is already open");
-      return ESP_ERR_INVALID_STATE;
+      printf("Can't move the window because it is already open");
+      return;
     }
     move_open();
   }
-  return ESP_OK;
 }
 
 void sliding_window::move_close() {
