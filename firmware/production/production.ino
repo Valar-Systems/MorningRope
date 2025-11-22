@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <ESPUI.h>
-#include <ezTime.h>
 
 #include <TMCStepper.h>
 #include <Preferences.h>
@@ -9,11 +8,14 @@
 #include "MotorControl.h"
 #include "API.h"
 #include <EEPROM.h>
+#include <ArduinoOTA.h>  // For enabling over-the-air updates
 
 void setup() {
 
   Serial.begin(115200);
-  delay(1000);
+  Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN);  // ESP32 can use any pins to Serial
+
+  delay(100);
   preferences.begin("local", false);
   load_preferences();
   setup_motors();
@@ -74,15 +76,17 @@ void loop()
         if (run_motor == true && move_to_step == 0){
           stepper->forceStop();
           move_to_step = max_steps;
-          stepper->moveTo(move_to_step);
+          //Or movetopercent();
+          move_close();
           }
         
         else if(run_motor == true && move_to_step == max_steps )
         {
           stepper->forceStop();
           delay(100);
-          move_to_step = stepper->getCurrentPosition();
-          stepper->moveTo(move_to_step);
+          move_to_step = getCurrentPosition();
+          //Or movetopercent();
+          move_open();
         }
         else
           {

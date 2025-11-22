@@ -3,6 +3,10 @@ bool stop_motor = false;
 volatile bool sensor1_trip = false;
 volatile bool sensor2_trip = false;
 int current_position;
+
+int32_t motor_position;
+bool is_closing;
+
 int max_steps;
 int current;
 int stall;
