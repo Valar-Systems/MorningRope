@@ -1,17 +1,14 @@
 #include <Arduino.h>
 #include <ESPUI.h>
 #include <ezTime.h>
-#include "FastAccelStepper.h"
-#include <HardwareSerial.h>
+
 #include <TMCStepper.h>
-#include <SPI.h>
 #include <Preferences.h>
 #include "Memory.h"
 #include "ResetButton.h"
 #include "MotorControl.h"
 #include "API.h"
 #include <EEPROM.h>
-#include "ESPUI.h"
 
 void setup() {
 
@@ -24,41 +21,8 @@ void setup() {
   API();
   ESPUIsetup();
 
-  // Now set up tasks to run independently.
-  xTaskCreatePinnedToCore(
-    MotorTask //Motor Task
-    ,  "MotorTask"   // A name just for humans
-    ,  1024 * 4 // This stack size can be checked & adjusted by reading the Stack Highwater
-    ,  NULL
-    ,  3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-    ,  NULL
-    ,  1);
-
-  xTaskCreatePinnedToCore(
-    ButtonTask //Motor Task
-    ,  "ButtonTask"   // A name just for humans
-    ,  1024 * 4 // This stack size can be checked & adjusted by reading the Stack Highwater
-    ,  NULL
-    ,  3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-    ,  NULL
-    ,  0);
-}
-
 void loop()
 {
-  // Empty. Things are done in Tasks.
-}
-
-/*--------------------------------------------------*/
-/*---------------------- Tasks ---------------------*/
-/*--------------------------------------------------*/
-
-void ButtonTask(void *pvParameters)  // Motor Task
-{
-  (void) pvParameters;
-
-  for (;;)
-  {
 
     if (btn1Press == 1) {
 
@@ -97,20 +61,6 @@ void ButtonTask(void *pvParameters)  // Motor Task
         vTaskDelay(30);
       }
 
-      //Fade instead of turn off
-      if (brightness0 > 255) {
-        brightness0 = 255;
-        fade0Amount = -fade0Amount;
-      }
-
-      if (brightness0 < 0) {
-
-        brightness0 = 0;
-        ledcWrite(0, brightness0);
-        btn1Press = 0;
-        fade0Amount = 15;
-        motorRunning = false;
-      }
     }
 
     if (btn2Press == 1) {
@@ -141,26 +91,6 @@ void ButtonTask(void *pvParameters)  // Motor Task
           }
         }
 
-      if (brightness1 <= 255 && brightness1 >= 0) {
-        ledcWrite(1, brightness1); // set the brightness of the LED
-        brightness1 = brightness1 + fade1Amount;
-        vTaskDelay(30);
-      }
-
-      //Fade instead of turn off
-      if (brightness1 > 255) {
-        brightness1 = 255;
-        fade1Amount = -fade1Amount;
-      }
-
-      if (brightness1 < 0) {
-
-        brightness1 = 0;
-        ledcWrite(1, brightness1);
-        btn2Press = 0;
-        fade1Amount = 15;
-        motorRunning = false;
-      }
     }
 
     else
@@ -170,12 +100,6 @@ void ButtonTask(void *pvParameters)  // Motor Task
   }
 }
 
-void MotorTask(void *pvParameters)  // Motor Task
-{
-  (void) pvParameters;
-
-  for (;;)
-  {
 
     if (run_motor == true)
     {
