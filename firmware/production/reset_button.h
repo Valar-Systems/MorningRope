@@ -1,9 +1,5 @@
-#define WIFI_PIN 4
-
 volatile bool     g_buttonPressed = false;
 volatile uint32_t g_buttonPressTime = -1;
-
-
 
 void button_action(void)
 {
@@ -17,7 +13,7 @@ void button_action(void)
 void button_change(void)
 {
   Serial.println("WiFi Reset Pressed");
-  bool buttonState = !digitalRead(WIFI_PIN);
+  bool buttonState = !digitalRead(BUTTON_WIFI_PIN);
 
   if (buttonState && !g_buttonPressed) {
     g_buttonPressTime = millis();

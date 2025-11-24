@@ -33,7 +33,15 @@ Next, measure the diameter of the pulley you are using. In the case of the S1 cu
 
 Next, convert 12mm diameter to circumferance which is 37.7 mm.
 
+12mm = 0.472441 inches
+37.7mm = 1.484252 inches
+
 Next, divide the total travel by cicumferance 
+
+inches = travel/1.484252
+
+if total travel is 20 inches, then revolutions = 13.4748 revolution
+at 200 steps/revoltion, total steps = 2694.96
 
 ## Step 2 - Download and open the Arduino code
 Using Arduino, open the VAL-1000.ino file

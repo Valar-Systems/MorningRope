@@ -1,50 +1,43 @@
-bool stalled_motor = false;
+#include <Preferences.h>
+
+bool stall_flag = false;
+
 bool stop_motor = false;
-volatile bool sensor1_trip = false;
-volatile bool sensor2_trip = false;
-int current_position;
+bool opening_direction;
 
-int32_t motor_position;
-bool is_closing;
+int travel_distance;
 
-int max_steps;
 int current;
 int stall;
 int accel;
 int max_speed;
 int tcools = (3089838.00 * pow(float(max_speed), -1.00161534)) * 1.5;
 int motor_microsteps = 64;
-int move_to_step = 0;
-int move_to_percent = 0;
-int set_zero = 0; // Set to 1 to set home position
+
+int set_zero = 0;  // Set to 1 to set home position
 bool run_motor = false;
+
+
+bool is_closing;
+bool is_moving = false;
+bool stop_flag = false;
+bool overtemp_flag= false;;
+
+uint8_t PWM_grad;
+uint32_t target_position;
+int32_t motor_position;
+uint32_t maximum_motor_position = 200;
+uint8_t target_percent;
+
 int wifi_set;
 bool wifi_button = false;
+
 String ssid;
-String pass;
+String password;
 
-String MYTIMEZONE;
-int close_timer = 0;
-int close_hour;
-int close_hour_input;
-int close_minute;
-int open_timer = 0;
-int open_hour;
-int open_hour_input;
-int open_minute;
-String open_time_string;
-String close_time_string;
-int openEvent;
-int closeEvent;
-int openEventNow;
-int closeEventNow;
-int open_direction;
+const byte DNS_PORT = 53;
+IPAddress apIP(192, 168, 4, 1);
 
-int open_am_pm;
-String open_am_pm_s;
-
-int close_am_pm;
-String close_am_pm_s;
 
 // Filter anti-rebond (debouncer)
 #define DEBOUNCE_TIME 250
@@ -57,33 +50,15 @@ void load_preferences() {
   Serial.println("LOADING PREFERENCES");
 
   wifi_set = preferences.getInt("wifi_set", 0);
-  ssid = preferences.getString ("ssid", "NOT_SET");
-  pass = preferences.getString ("pass", "NOT_SET");
-  max_steps = preferences.getInt("max_steps", 300000);
+  ssid = preferences.getString("ssid", "NOT_SET");
+  password = preferences.getString("pass", "NOT_SET");
+  maximum_motor_position = preferences.getInt("max_motor_pos", 200);
+  motor_position = preferences.getInt("motor_pos", 0);
   current = preferences.getLong("current", 1000);
   stall = preferences.getInt("stall", 10);
   accel = preferences.getInt("accel", 10000);
   max_speed = preferences.getInt("max_speed", 30000);
-  open_direction =  preferences.getInt("open_dir", 0);
-  
-  
-  open_timer = preferences.getInt("open_timer", 0);
-  close_timer = preferences.getInt("close_timer", 0);
-  open_hour = preferences.getInt("open_hour", 12);
-  open_hour_input = preferences.getInt("open_hour_in", 12);
-
-  open_am_pm = preferences.getInt("open_am_pm", 0);
-  open_am_pm_s = preferences.getString("open_am_pm_s", "AM");
-
-  close_hour = preferences.getInt("close_hour", 12);
-  close_hour_input = preferences.getInt("close_hour_in", 12);
-
-  open_minute = preferences.getInt("open_minute", 0);
-  close_minute = preferences.getInt("close_minute", 0);
-  close_am_pm = preferences.getInt("close_am_pm", 0);
-  close_am_pm_s = preferences.getString("close_am_pm_s", "AM");
-
-  MYTIMEZONE = preferences.getString("timezone", "America/Los_Angeles");
+  opening_direction = preferences.getInt("open_dir", 0);
 
   Serial.println("FINISHED LOADING PREFERENCES");
 }
