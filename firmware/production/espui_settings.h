@@ -6,11 +6,6 @@ uint16_t speedMax;
 uint16_t accelMax;
 String display_wifi;
 
-DNSServer dnsServer;
-
-//Function Prototypes
-//void textCallback(Control *sender, int type);
-//void enterWifiDetailsCallback(Control *sender, int type);
 
 void numberMaxStepsCall(Control* sender, int type) {
   maximum_motor_position = sender->value.toInt();
@@ -210,12 +205,12 @@ void ESPUIsetup() {
   apiPosition += target_percent;
   ESPUI.addControl(ControlType::Label, "Move to Position", apiPosition, ControlColor::Turquoise, tab4);
 
-  String apisettings;
-  apisettings.reserve(150);
-  apisettings = "http://";
-  apisettings += API_IP;
-  apisettings += ":8080/position";
-  ESPUI.addControl(ControlType::Label, "Check Settings", apisettings, ControlColor::Turquoise, tab4);
+  String apiSettings;
+  apiSettings.reserve(150);
+  apiSettings = "http://";
+  apiSettings += API_IP;
+  apiSettings += ":8080/settings";
+  ESPUI.addControl(ControlType::Label, "Check Settings", apiSettings, ControlColor::Turquoise, tab4);
 
   ESPUI.sliderContinuous = false;
   ESPUI.begin("Valar Systems");

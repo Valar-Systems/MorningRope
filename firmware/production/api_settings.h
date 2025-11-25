@@ -3,11 +3,9 @@
 #include "ESPAsyncWebServer.h"
 #include "AsyncJson.h"
 #include "ArduinoJson.h"
-#include <DNSServer.h>
+
 #include <ESPmDNS.h>
 
-String ip_address;
-String hostname = "VAL3000";
 #define HOSTNAME "val3000"
 
 AsyncWebServer serverAPI(8080);
@@ -56,35 +54,22 @@ void setup_wifi() {
   connectWifiAP();
 
   serverAPI.on("/position", HTTP_GET, [](AsyncWebServerRequest* request) {
-    // int paramsNr = request->params();
-
-    //String inputMessage1;
-
-    // for (int i = 0; i < paramsNr; i++) {
-    //   receivedData = request->getParam(i);
-    // }
-
     if (request->hasParam("target_percent")) {
       target_percent = request->getParam("target_percent")->value().toInt();
       Serial.print("target_percent: ");
       move_to_percent100ths(target_percent);
       run_motor = true;
     }
-
     request->send(200, "text/html", "Great Success");
   });
 
-
   serverAPI.on("/settings", HTTP_GET, [](AsyncWebServerRequest* request) {
     JsonDocument doc;
-    doc["position"] = getMotorPosition();
-
+    doc["position"] = target_percent;
     String json;
     serializeJson(doc, json);
-
     request->send(200, "application/json", json);
   });
-
   serverAPI.begin();
 }
 

@@ -33,8 +33,8 @@ bool overtemp_flag = false;
 
 uint8_t PWM_grad;
 uint32_t target_position;
-int32_t motor_position;
-uint32_t maximum_motor_position = 200;
+uint32_t motor_position;
+uint32_t maximum_motor_position;
 uint8_t target_percent;
 
 int wifi_set;
@@ -45,7 +45,6 @@ String password;
 
 const byte DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1);
-
 
 // Filter anti-rebond (debouncer)
 #define DEBOUNCE_TIME 250
@@ -60,7 +59,7 @@ void load_preferences() {
   wifi_set = preferences.getInt("wifi_set", 0);
   ssid = preferences.getString("ssid", "NOT_SET");
   password = preferences.getString("pass", "NOT_SET");
-  maximum_motor_position = preferences.getInt("max_motor_pos", 200);
+  maximum_motor_position = preferences.getInt("max_motor_pos", 2695); // defaults to 20 inches
   motor_position = preferences.getInt("motor_pos", 0);
   current = preferences.getLong("current", 1000);
   stall = preferences.getInt("stall", 10);

@@ -3,7 +3,6 @@
 #include "motor_control.h"
 #include "api_settings.h"
 #include "espui_settings.h"
-//#include "reset_button.h"
 #include <ArduinoOTA.h>  // For enabling over-the-air updates
 
 void setup() {
@@ -37,14 +36,14 @@ void loop() {
 
   } else if (btn1Press == true) {
     // add debounce timer
-    delay(500);
+    delay(500); //Lazy debounce
     Serial.println("START MOTOR CLOSE");
     move_to_percent100ths(0);
     btn1Press = false;
 
   } else if (btn2Press == true) {
     // add debounce timer
-    delay(500);
+    delay(500); //Lazy debounce
     Serial.println("START MOTOR CLOSE");
     move_to_percent100ths(100);
     btn2Press = false;

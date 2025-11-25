@@ -2,7 +2,7 @@ uint16_t positionLabel;
 
 #include <TMCStepper.h>
 #include <ESPUI.h>
-
+#include <DNSServer.h>
 
 #include "soc/timer_group_struct.h"
 #include "soc/timer_group_reg.h"
@@ -28,15 +28,17 @@ uint16_t positionLabel;
 void move_close(void);
 void move_open(void);
 void move_open(void);
-bool position_watcher(void);
 void stop(void);
 
 int btn1Press;
 int btn2Press;
 
+void position_watcher_task(void *parameter);
+TaskHandle_t position_watcher_task_handler = NULL;
+
 
 TMC2209Stepper driver(&Serial1, R_SENSE, DRIVER_ADDRESS);
-
+DNSServer dnsServer;
 
 void IRAM_ATTR button1pressed() {
 
@@ -79,8 +81,6 @@ void IRAM_ATTR index_interrupt(void) {
   } else if (motor_position > maximum_motor_position) {
     motor_position = maximum_motor_position;
   }
-
-  //motor_position = motor_position;
 }
 
 int getMotorPosition() {
@@ -152,29 +152,17 @@ void move_close() {
   printf("motor_position close: %lu\n", motor_position);    // TESTING
   printf("target_position close: %lu\n", target_position);  // TESTING
 
+  printf("max_motor_position close: %lu\n", maximum_motor_position);  // TESTING
+  printf("target_percent close: %lu\n", target_percent);  // TESTING
+
   stop_flag = false;
   is_closing = true;
   is_moving = true;
 
+  xTaskCreate(position_watcher_task, "position_watcher_task", 4096, NULL, 1, &position_watcher_task_handler);
+
   enable_driver();
-
-  // printf("VACTUAL: %lu", driver.VACTUAL()); // TESTING
-  // printf("semin: %i", driver.semin());      // TESTING
-  // printf("ihold: %i", driver.ihold());      // TESTING
-  // printf("ihold: %i", driver.irun());       // TESTING
-
-  driver.VACTUAL(CLOSE_VELOCITY);
-
-  bool status = false;
-  while (status == false) {
-    status = position_watcher();
-    printf("motor_position: %lu\n", motor_position);  // TESTING
-    delay(200);
-  }
-
-  is_moving = false;
-  //save motor postion in case power outage
-  preferences.putInt("motor_pos", motor_position);
+  driver.VACTUAL(OPEN_VELOCITY);
 }
 
 void move_open() {
@@ -184,67 +172,70 @@ void move_open() {
     motor_position = maximum_motor_position;
   }
 
-  printf("motor_position open: %lu\n", motor_position);    // TESTING
-  printf("target_position open: %lu\n", target_position);  // TESTING
+  printf("motor_position close: %lu\n", motor_position);    // TESTING
+  printf("target_position close: %lu\n", target_position);  // TESTING
+
+  printf("max_motor_position close: %lu\n", maximum_motor_position);  // TESTING
+  printf("target_percent close: %lu\n", target_percent);  // TESTING
 
   stop_flag = false;
   is_closing = false;
   is_moving = true;
 
+  xTaskCreate(position_watcher_task, "position_watcher_task", 4096, NULL, 1, &position_watcher_task_handler);
+
   enable_driver();
-
   driver.VACTUAL(OPEN_VELOCITY);
-
-  // while position_watcher == false
-
-  bool status = false;
-  while (status == false) {
-    status = position_watcher();
-    printf("motor_position: %lu\n", motor_position);  // TESTING
-    delay(200);
-  }
-
-  is_moving = false;
-  preferences.putInt("motor_pos", motor_position);
 }
 
 // User return statement?
-bool position_watcher() {
+void position_watcher_task(void *parameter) {
 
-  // check if button was pressed
-  //if (!digitalRead(BUTTON_1_PIN) || !digitalRead(BUTTON_2_PIN)) {
-  if (stop_flag) {
-    stop();
-    stop_flag = false;
-    printf("position_watcher: button pressed stop == true\n");
-    return true;
-  }
+  while (true) {
 
-  // Check for stall flag //
-  if (stall_flag == true) {
-    stop();
-    stall_flag = false;
-    printf("position_watcher: stall_flag == true\n");
-    return true;
-  }
+    while (is_moving) {
 
-  // /* Check if Position reached */
-  if (is_closing) {
-    if (motor_position >= target_position) {
-      printf("position_watcher STOPPING because target_position: %u <= motor_position: %u\n", (unsigned int)target_position, (unsigned int)motor_position);
-      stop();
-      return true;
+      Serial.println(motor_position);
+
+      // check if button was pressed
+      if (stop_flag) {
+        stop();
+        stop_flag = false;
+        printf("position_watcher: button pressed stop == true\n");
+        goto notify_and_suspend;
+      }
+
+      // Check for stall flag //
+      if (stall_flag) {
+        stop();
+        stall_flag = false;
+        printf("position_watcher: stall_flag == true\n");
+        goto notify_and_suspend;
+      }
+
+      // /* Check if Position reached */
+      if (is_closing) {
+        if (motor_position >= target_position) {
+          printf("position_watcher STOPPING because target_position: %u <= motor_position: %u\n", (unsigned int)target_position, (unsigned int)motor_position);
+          stop();
+          goto notify_and_suspend;
+        }
+      } else {
+        if (motor_position <= target_position) {
+          printf("position_watcher_task STOPPING because target_position: %u >= motor_position: %u\n", (unsigned int)target_position, (unsigned int)motor_position);
+          stop();
+          goto notify_and_suspend;
+        }
+      }
+
+      delay(20);
     }
-  } else {
-    if (motor_position <= target_position) {
-      printf("position_watcher_task STOPPING because target_position: %u >= motor_position: %u\n", (unsigned int)target_position, (unsigned int)motor_position);
-      stop();
-      return true;
-    }
+
+notify_and_suspend:
+    is_moving = false;
+    preferences.putInt("motor_pos", motor_position);
+    vTaskDelete(NULL);
   }
-
-
-  return false;
 }
 
 /* Stops motor */

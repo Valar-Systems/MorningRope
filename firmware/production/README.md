@@ -1,5 +1,5 @@
-# VAL-2000 HTTP Server Firmware
-## Getting Started with the VAL-2000
+# VAL3000 HTTP Server Firmware
+## Getting Started with the VAL3000
 
 This firmware will get you started with spinning the VAL-1000 WiFi stepper board.
 
