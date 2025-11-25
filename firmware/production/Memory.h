@@ -6,6 +6,12 @@ bool stop_motor = false;
 bool opening_direction;
 
 int travel_distance;
+float diameter_pulley_cm = 1.2f;  // Only change the value if updating the pulley size
+
+
+float diameter_pulley_in = diameter_pulley_cm * 0.3937f;
+float circumference_cm = diameter_pulley_cm * PI;
+float circumference_in = diameter_pulley_in * PI;
 
 int current;
 int stall;
@@ -17,11 +23,13 @@ int motor_microsteps = 64;
 int set_zero = 0;  // Set to 1 to set home position
 bool run_motor = false;
 
+bool is_cm;
 
 bool is_closing;
 bool is_moving = false;
 bool stop_flag = false;
-bool overtemp_flag= false;;
+bool overtemp_flag = false;
+;
 
 uint8_t PWM_grad;
 uint32_t target_position;
@@ -59,6 +67,9 @@ void load_preferences() {
   accel = preferences.getInt("accel", 10000);
   max_speed = preferences.getInt("max_speed", 30000);
   opening_direction = preferences.getInt("open_dir", 0);
+  is_cm = preferences.getInt("is_cm", 0);
+  travel_distance = preferences.getInt("travel_dist", 20);
+  target_percent = ((float)motor_position / (float)maximum_motor_position) * 100;
 
   Serial.println("FINISHED LOADING PREFERENCES");
 }

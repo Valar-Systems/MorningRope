@@ -57,7 +57,19 @@ void numberTravelCall(Control* sender, int type) {
   preferences.putInt("travel_dist", travel_distance);
   Serial.print("travel_distance: ");
   Serial.println(travel_distance);
-  maximum_motor_position = (travel_distance / 1.484252) * 200; //For a 12mm diameter pulley. At 200 steps/revolution
+
+  if (is_cm == true) {                                                    // convert cm to steps
+    maximum_motor_position = (travel_distance / circumference_cm) * 200;  // 200 steps per revolution
+    Serial.print("maximum_motor_position: ");
+    Serial.println(maximum_motor_position);
+    preferences.putInt("max_motor_pos", maximum_motor_position);
+
+  } else {                                                                // convert inches to steps
+    maximum_motor_position = (travel_distance / circumference_in) * 200;  // 200 steps per revolution
+    Serial.print("maximum_motor_position: ");
+    Serial.println(maximum_motor_position);
+    preferences.putInt("max_motor_pos", maximum_motor_position);
+  }
 }
 
 void sliderPosition(Control* sender, int type) {
@@ -68,13 +80,13 @@ void sliderPosition(Control* sender, int type) {
   run_motor = true;
 }
 
-void buttonSetZeroCall(Control* sender, int type) {
+void buttonSetCloseCall(Control* sender, int type) {
   switch (type) {
     case B_DOWN:
       Serial.println("Button Pressed");
-      set_zero = 1;
-      Serial.print("set_zero: ");
-      Serial.println(set_zero);
+      motor_position = maximum_motor_position;
+      Serial.print("set close position: ");
+      Serial.println(maximum_motor_position);
       break;
   }
 }
@@ -93,6 +105,24 @@ void switchChangeDirectionCall(Control* sender, int value) {
       opening_direction = 0;
       preferences.putInt("open_dir", opening_direction);
       driver.shaft(false);
+      break;
+  }
+  Serial.print(" ");
+  Serial.println(sender->id);
+}
+
+void switchUnitsCall(Control* sender, int value) {
+  switch (value) {
+    case S_ACTIVE:
+      Serial.print("is_cm");
+      is_cm = 1;
+      preferences.putInt("is_cm", is_cm);
+      break;
+
+    case S_INACTIVE:
+      Serial.print("!is_cm");
+      is_cm = 0;
+      preferences.putInt("is_cm", is_cm);
       break;
   }
   Serial.print(" ");
@@ -133,29 +163,23 @@ void ESPUIsetup() {
   uint16_t tab3 = ESPUI.addControl(ControlType::Tab, "WiFi", "WiFi");
   uint16_t tab4 = ESPUI.addControl(ControlType::Tab, "API", "API");
 
-  // // shown above all tabs. Not part of any tab
-  // //status = ESPUI.addControl(ControlType::Label, "Status:", "Stop", ControlColor::Turquoise);
-
   //Tab1: Positioning
-  //Text: Current position percent
-  positionLabel = ESPUI.addControl(ControlType::Label, "Current Position", String(target_percent), ControlColor::Turquoise, tab1);
-  //Slider: Move to position
-  uint16_t positionMax = ESPUI.addControl(ControlType::Slider, "Position", "0", ControlColor::Alizarin, tab1, &sliderPosition);
-  ESPUI.addControl(ControlType::Min, "", "0", ControlColor::None, positionMax);
-  ESPUI.addControl(ControlType::Max, "", "100", ControlColor::None, positionMax);
+  uint16_t positionSlider = ESPUI.addControl(ControlType::Slider, "Position", String(target_percent), ControlColor::Alizarin, tab1, &sliderPosition); //Slider: Move to position
+  ESPUI.addControl(ControlType::Min, "", "0", ControlColor::None, positionSlider);
+  ESPUI.addControl(ControlType::Max, "", "100", ControlColor::None, positionSlider);
 
 
   // //Tab2: Settings
   ESPUI.addControl(ControlType::Separator, "Home Position", "", ControlColor::Peterriver, tab2);
   //Button: Set Zero
   ESPUI.addControl(ControlType::Switcher, "Change Direction", String(opening_direction), ControlColor::Dark, tab2, &switchChangeDirectionCall);
-  ESPUI.addControl(ControlType::Button, "Set Zero", "Set", ControlColor::Dark, tab2, &buttonSetZeroCall);
-
+  ESPUI.addControl(ControlType::Button, "Set Close Position", "Set", ControlColor::Dark, tab2, &buttonSetCloseCall);
   ESPUI.addControl(ControlType::Separator, "Motor Setting", "", ControlColor::Peterriver, tab2);
-  //Number: Max Steps
-  //ESPUI.addControl(ControlType::Number, "Max Steps:", String(maximum_motor_position), ControlColor::Peterriver, tab2, &numberMaxStepsCall);
-   //Number: Max Steps
-  ESPUI.addControl(ControlType::Number, "Max Inches:", String(travel_distance), ControlColor::Peterriver, tab2, &numberTravelCall);
+
+  Serial.println("travel_distance: ");
+  Serial.println(travel_distance);
+  ESPUI.addControl(ControlType::Number, "Max Distance:", String(travel_distance), ControlColor::Peterriver, tab2, &numberTravelCall);
+  ESPUI.addControl(ControlType::Switcher, "Inches/Centimeters", String(is_cm), ControlColor::Dark, tab2, &switchUnitsCall);
 
   // //Number: Current
   // speedMax = ESPUI.addControl(ControlType::Number, "Speed", String(max_speed), ControlColor::Alizarin, tab2, &numberSpeedCall);
@@ -175,18 +199,26 @@ void ESPUIsetup() {
   ESPUI.addControl(ControlType::Button, "Save Settings", "SAVE", ControlColor::Emerald, tab3, &buttonSaveNetworkCall);                 //Button: Save
 
 
-  // causes CRASH.  Likely IPaddress to string
   //Tab4: API
-  // char apiPosition[50];
-  // snprintf(apiPosition, sizeof(apiPosition), "http://%s:8080/position?target_percent=%i", WiFi.localIP().toString(), target_percent);
-  // ESPUI.addControl(ControlType::Label, "Move to Position", apiPosition, ControlColor::Turquoise, tab4);
+  String API_IP = WiFi.localIP().toString();
 
-  // char apisettings[50];
-  // snprintf(apisettings, sizeof(apisettings), "http://%s:8080/settings", WiFi.localIP().toString());
-  // ESPUI.addControl(ControlType::Label, "Check Settings", apisettings, ControlColor::Turquoise, tab4);
+  String apiPosition;
+  apiPosition.reserve(150);
+  apiPosition = "http://";
+  apiPosition += API_IP;
+  apiPosition += ":8080/position?target_percent=";
+  apiPosition += target_percent;
+  ESPUI.addControl(ControlType::Label, "Move to Position", apiPosition, ControlColor::Turquoise, tab4);
 
-
+  String apisettings;
+  apisettings.reserve(150);
+  apisettings = "http://";
+  apisettings += API_IP;
+  apisettings += ":8080/position";
+  ESPUI.addControl(ControlType::Label, "Check Settings", apisettings, ControlColor::Turquoise, tab4);
 
   ESPUI.sliderContinuous = false;
   ESPUI.begin("Valar Systems");
+
+  ESPUI.updateSlider(positionSlider, target_percent);
 }

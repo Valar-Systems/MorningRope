@@ -20,8 +20,8 @@ uint16_t positionLabel;
 #define DRIVER_ADDRESS 0b00  // TMC2209 Driver address according to MS1 and MS2
 #define R_SENSE 0.11f        // R_SENSE for current calc.
 
-#define CLOSE_VELOCITY 1200
-#define OPEN_VELOCITY -1200
+#define CLOSE_VELOCITY 800
+#define OPEN_VELOCITY -800
 #define STOP_MOTOR_VELOCITY 0
 
 // function prototypes
@@ -229,25 +229,20 @@ bool position_watcher() {
   }
 
   // /* Check if Position reached */
-  if (target_position != maximum_motor_position && target_position != 0) {
-    if (is_closing) {
-      if (motor_position >= target_position) {
-        printf("position_watcher STOPPING because target_position: %u <= motor_position: %u\n", (unsigned int)target_position, (unsigned int)motor_position);
-        stop();
-        if (motor_position >= maximum_motor_position)
-          motor_position = maximum_motor_position;
-        return true;
-      }
-    } else {
-      if (motor_position <= target_position) {
-        printf("position_watcher_task STOPPING because target_position: %u >= motor_position: %u\n", (unsigned int)target_position, (unsigned int)motor_position);
-        stop();
-        if (motor_position >= 2147483647)
-          motor_position = 0;
-        return true;
-      }
+  if (is_closing) {
+    if (motor_position >= target_position) {
+      printf("position_watcher STOPPING because target_position: %u <= motor_position: %u\n", (unsigned int)target_position, (unsigned int)motor_position);
+      stop();
+      return true;
+    }
+  } else {
+    if (motor_position <= target_position) {
+      printf("position_watcher_task STOPPING because target_position: %u >= motor_position: %u\n", (unsigned int)target_position, (unsigned int)motor_position);
+      stop();
+      return true;
     }
   }
+
 
   return false;
 }
@@ -343,7 +338,7 @@ void setup_motors() {
   driver.diss2g(0);
   driver.dedge(0);
   driver.intpol(1);
-  
+
   driver.mres(8);  // 8 = FULLSTEP mode. 200 pulses per revolution.
   driver.vsense(0);
   driver.tbl(2);
