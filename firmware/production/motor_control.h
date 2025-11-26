@@ -20,8 +20,8 @@ uint16_t positionLabel;
 #define DRIVER_ADDRESS 0b00  // TMC2209 Driver address according to MS1 and MS2
 #define R_SENSE 0.11f        // R_SENSE for current calc.
 
-#define CLOSE_VELOCITY 800
-#define OPEN_VELOCITY -800
+#define CLOSE_VELOCITY 400
+#define OPEN_VELOCITY -400
 #define STOP_MOTOR_VELOCITY 0
 
 // function prototypes
@@ -36,35 +36,12 @@ int btn2Press;
 void position_watcher_task(void *parameter);
 TaskHandle_t position_watcher_task_handler = NULL;
 
-
 TMC2209Stepper driver(&Serial1, R_SENSE, DRIVER_ADDRESS);
 DNSServer dnsServer;
-
-void IRAM_ATTR button1pressed() {
-
-  if (is_moving == true) {
-    stop_flag = true;
-  }
-
-  btn1Press = true;
-}
-
-void IRAM_ATTR button2pressed() {
-
-  if (is_moving == true) {
-    stop_flag = true;
-  }
-
-  btn2Press = true;
-}
 
 void IRAM_ATTR stall_interrupt() {
   stall_flag = true;
 }
-
-// void IRAM_ATTR wifi_button_press() {
-//   wifi_button = true;
-// }
 
 // Interrupt tracks the position of the stepper motor using the index pin
 void IRAM_ATTR index_interrupt(void) {
@@ -98,7 +75,6 @@ void disable_driver() {
   digitalWrite(ENABLE_PIN, 1);
 }
 
-
 void setZero() {
   motor_position = 0;
   Serial.print("motor_position: ");
@@ -106,17 +82,9 @@ void setZero() {
   ESPUI.updateLabel(positionLabel, String(motor_position));
 }
 
-void goHome() {
-  motor_position = 0;
-  target_position = -10000;
-  run_motor = true;
-}
-
 /* Function that commands motor to move to position */
 void move_to_percent100ths(uint16_t percent100ths) {
   printf("move_to_percent100ths(): %i\n", percent100ths);
-
-  printf("stop_flag: %d\n", stop_flag);  // TESTING
 
   switch (percent100ths) {
     case 0:
@@ -129,6 +97,10 @@ void move_to_percent100ths(uint16_t percent100ths) {
       target_position = (percent100ths / 100.0) * maximum_motor_position;
       break;
   }
+
+  printf("target_position(): %i\n", target_position);
+  printf("motor_position(): %i\n", motor_position);
+  printf("maximum_motor_position(): %i\n", maximum_motor_position);
 
   if (target_position == motor_position) {
     printf("Not moving the window because it is already at the desired position\n");
@@ -202,6 +174,7 @@ void position_watcher_task(void *parameter) {
         stop();
         stop_flag = false;
         printf("position_watcher: button pressed stop == true\n");
+        delay(1000);
         goto notify_and_suspend;
       }
 
@@ -349,7 +322,4 @@ void setup_motors() {
 
   attachInterrupt(STALLGUARD_PIN, stall_interrupt, RISING);
   attachInterrupt(INDEX_PIN, index_interrupt, RISING);
-  //attachInterrupt(BUTTON_WIFI_PIN, wifi_button_press, FALLING);
-  attachInterrupt(BUTTON_1_PIN, button1pressed, FALLING);
-  attachInterrupt(BUTTON_2_PIN, button2pressed, FALLING);
 }

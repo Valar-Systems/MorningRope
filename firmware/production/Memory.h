@@ -29,11 +29,10 @@ bool is_closing;
 bool is_moving = false;
 bool stop_flag = false;
 bool overtemp_flag = false;
-;
 
 uint8_t PWM_grad;
 uint32_t target_position;
-uint32_t motor_position;
+int32_t motor_position;
 uint32_t maximum_motor_position;
 uint8_t target_percent;
 
