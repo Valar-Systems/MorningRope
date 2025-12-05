@@ -1,5 +1,8 @@
+## Kits
+You can purchase a hardware kit [here](https://valarsystems.com/products/morningrope) to easily build this yourself. You can also purchase the 3D prints if needed.
+
 ## New Book!!
-I've written a short book to teach you how to program this Trinamic stepper motor. It can be found on [Amazon here](https://amzn.to/3VdUWrN)
+I've written a short book to teach you how to program this Trinamic stepper motor from scratch. It can be found [here](https://valarsystems.com/products/controlling-trinamic-drivers-pdf)
 
 # MorningRope: Automated Curtain Opener
 
