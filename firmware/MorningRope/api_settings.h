@@ -58,7 +58,6 @@ void setup_wifi() {
       target_percent = request->getParam("target_percent")->value().toInt();
       Serial.print("target_percent: ");
       move_to_percent100ths(target_percent);
-      run_motor = true;
     }
     request->send(200, "text/html", "Great Success");
   });

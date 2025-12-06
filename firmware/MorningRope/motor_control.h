@@ -1,6 +1,9 @@
 uint16_t positionLabel;
 
+
+
 #include <TMCStepper.h>
+
 #include <ESPUI.h>
 #include <DNSServer.h>
 
@@ -8,20 +11,20 @@ uint16_t positionLabel;
 #include "soc/timer_group_reg.h"
 
 #define ENABLE_PIN 8
-#define BUTTON_1_PIN 3
-#define BUTTON_2_PIN 4
-#define WIFI_RESET_PIN 7
 #define RX_PIN 5
 #define TX_PIN 6
-
 #define STALLGUARD_PIN 1
 #define INDEX_PIN 0
+
+#define BUTTON_1_PIN GPIO_NUM_3
+#define BUTTON_2_PIN GPIO_NUM_4
+#define WIFI_RESET_PIN GPIO_NUM_7
 
 #define DRIVER_ADDRESS 0b00  // TMC2209 Driver address according to MS1 and MS2
 #define R_SENSE 0.11f        // R_SENSE for current calc.
 
-#define CLOSE_VELOCITY 400
-#define OPEN_VELOCITY -400
+#define CLOSE_VELOCITY 600
+#define OPEN_VELOCITY -600
 #define STOP_MOTOR_VELOCITY 0
 
 // function prototypes
@@ -30,14 +33,13 @@ void move_open(void);
 void move_open(void);
 void stop(void);
 
-int btn1Press;
-int btn2Press;
-
 void position_watcher_task(void *parameter);
 TaskHandle_t position_watcher_task_handler = NULL;
 
 TMC2209Stepper driver(&Serial1, R_SENSE, DRIVER_ADDRESS);
 DNSServer dnsServer;
+
+
 
 void IRAM_ATTR stall_interrupt() {
   stall_flag = true;
@@ -75,11 +77,12 @@ void disable_driver() {
   digitalWrite(ENABLE_PIN, 1);
 }
 
-void setZero() {
-  motor_position = 0;
-  Serial.print("motor_position: ");
-  Serial.println(motor_position);
-  ESPUI.updateLabel(positionLabel, String(motor_position));
+void setCloseCall() {
+  Serial.println("Button Pressed");
+  motor_position = maximum_motor_position;
+  target_percent = 100;
+  Serial.print("set close position: ");
+  Serial.println(target_percent);
 }
 
 /* Function that commands motor to move to position */
@@ -98,9 +101,9 @@ void move_to_percent100ths(uint16_t percent100ths) {
       break;
   }
 
-  printf("target_position(): %i\n", target_position);
-  printf("motor_position(): %i\n", motor_position);
-  printf("maximum_motor_position(): %i\n", maximum_motor_position);
+  //printf("target_position(): %i\n", target_position);
+  //printf("motor_position(): %i\n", motor_position);
+  //printf("maximum_motor_position(): %i\n", maximum_motor_position);
 
   if (target_position == motor_position) {
     printf("Not moving the window because it is already at the desired position\n");
@@ -121,11 +124,11 @@ void move_close() {
     motor_position = 0;
   }
 
-  printf("motor_position close: %lu\n", motor_position);    // TESTING
-  printf("target_position close: %lu\n", target_position);  // TESTING
+  // printf("motor_position close: %lu\n", motor_position);    // TESTING
+  // printf("target_position close: %lu\n", target_position);  // TESTING
 
-  printf("max_motor_position close: %lu\n", maximum_motor_position);  // TESTING
-  printf("target_percent close: %lu\n", target_percent);  // TESTING
+  // printf("max_motor_position close: %lu\n", maximum_motor_position);  // TESTING
+  // printf("target_percent close: %lu\n", target_percent);  // TESTING
 
   stop_flag = false;
   is_closing = true;
@@ -134,7 +137,8 @@ void move_close() {
   xTaskCreate(position_watcher_task, "position_watcher_task", 4096, NULL, 1, &position_watcher_task_handler);
 
   enable_driver();
-  driver.VACTUAL(OPEN_VELOCITY);
+  // Add for loop for acceleration
+  driver.VACTUAL(CLOSE_VELOCITY);
 }
 
 void move_open() {
@@ -148,7 +152,7 @@ void move_open() {
   printf("target_position close: %lu\n", target_position);  // TESTING
 
   printf("max_motor_position close: %lu\n", maximum_motor_position);  // TESTING
-  printf("target_percent close: %lu\n", target_percent);  // TESTING
+  printf("target_percent close: %lu\n", target_percent);              // TESTING
 
   stop_flag = false;
   is_closing = false;
@@ -157,6 +161,7 @@ void move_open() {
   xTaskCreate(position_watcher_task, "position_watcher_task", 4096, NULL, 1, &position_watcher_task_handler);
 
   enable_driver();
+  // Add for loop for acceleration
   driver.VACTUAL(OPEN_VELOCITY);
 }
 
@@ -207,6 +212,8 @@ void position_watcher_task(void *parameter) {
 notify_and_suspend:
     is_moving = false;
     preferences.putInt("motor_pos", motor_position);
+    target_percent = ((float)motor_position / (float)maximum_motor_position) * 100;
+    ESPUI.updateSlider(positionSlider, target_percent);
     vTaskDelete(NULL);
   }
 }
@@ -225,32 +232,16 @@ void setup_motors() {
   pinMode(ENABLE_PIN, OUTPUT);
   pinMode(STALLGUARD_PIN, INPUT);
   pinMode(INDEX_PIN, INPUT);
-  pinMode(WIFI_RESET_PIN, INPUT);
-  pinMode(BUTTON_1_PIN, INPUT);
-  pinMode(BUTTON_2_PIN, INPUT);
 
+  attachInterrupt(STALLGUARD_PIN, stall_interrupt, RISING);
+  attachInterrupt(INDEX_PIN, index_interrupt, RISING);
 
-  // driver.begin();
-  // driver.toff(4);
-  // driver.blank_time(24);
-  // driver.I_scale_analog(false);
-  // driver.internal_Rsense(false);
-  // driver.mstep_reg_select(true);
-  // driver.rms_current(current);
-  // driver.SGTHRS(stall);
-  // driver.mres(8);
-  // driver.TCOOLTHRS(tcools);  //
-  // driver.TPWMTHRS(0);
-  // driver.semin(0);
 
   if (opening_direction == 1) {
     driver.shaft(true);
   } else {
     driver.shaft(false);
   }
-
-  // driver.en_spreadCycle(false);
-  // driver.pdn_disable(true);
 
   /* General Registers */
   driver.I_scale_analog(false);
@@ -320,6 +311,5 @@ void setup_motors() {
   driver.pwm_grad(PWM_grad);  // Test different initial values. Use scope.
   driver.pwm_ofs(36);
 
-  attachInterrupt(STALLGUARD_PIN, stall_interrupt, RISING);
-  attachInterrupt(INDEX_PIN, index_interrupt, RISING);
+
 }

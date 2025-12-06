@@ -6,7 +6,6 @@ uint16_t speedMax;
 uint16_t accelMax;
 String display_wifi;
 
-
 void numberMaxStepsCall(Control* sender, int type) {
   maximum_motor_position = sender->value.toInt();
   preferences.putInt("max_motor_pos", maximum_motor_position);
@@ -72,7 +71,6 @@ void sliderPosition(Control* sender, int type) {
   target_percent = sender->value.toInt();
   target_position = (maximum_motor_position / 100) * target_percent;
   move_to_percent100ths(target_percent);
-  run_motor = true;
 }
 
 void buttonSetCloseCall(Control* sender, int type) {
@@ -80,8 +78,12 @@ void buttonSetCloseCall(Control* sender, int type) {
     case B_DOWN:
       Serial.println("Button Pressed");
       motor_position = maximum_motor_position;
+      target_percent = 100;
+
+      ESPUI.updateSlider(positionSlider, target_percent);
+
       Serial.print("set close position: ");
-      Serial.println(maximum_motor_position);
+      Serial.println(target_percent);
       break;
   }
 }
@@ -143,7 +145,6 @@ void buttonSaveNetworkCall(Control* sender, int type) {
 
 void buttonClearNetworkCall(Control* sender, int type) {
   if (type == B_UP) {
-    preferences.putInt("wifi_set", 0);
     preferences.putString("ssid", "NOT_SET");
     preferences.putString("pass", "NOT_SET");
     preferences.end();
@@ -159,7 +160,7 @@ void ESPUIsetup() {
   uint16_t tab4 = ESPUI.addControl(ControlType::Tab, "API", "API");
 
   //Tab1: Positioning
-  uint16_t positionSlider = ESPUI.addControl(ControlType::Slider, "Position", String(target_percent), ControlColor::Alizarin, tab1, &sliderPosition); //Slider: Move to position
+  positionSlider = ESPUI.addControl(ControlType::Slider, "Position. 100 = Closed. 0 = Opened", String(target_percent), ControlColor::Alizarin, tab1, &sliderPosition); //Slider: Move to position
   ESPUI.addControl(ControlType::Min, "", "0", ControlColor::None, positionSlider);
   ESPUI.addControl(ControlType::Max, "", "100", ControlColor::None, positionSlider);
 
@@ -168,7 +169,7 @@ void ESPUIsetup() {
   ESPUI.addControl(ControlType::Separator, "Home Position", "", ControlColor::Peterriver, tab2);
   //Button: Set Zero
   ESPUI.addControl(ControlType::Switcher, "Change Direction", String(opening_direction), ControlColor::Dark, tab2, &switchChangeDirectionCall);
-  ESPUI.addControl(ControlType::Button, "Set Close Position", "Set", ControlColor::Dark, tab2, &buttonSetCloseCall);
+  ESPUI.addControl(ControlType::ButtonESPUI, "Set Close Position", "Set", ControlColor::Dark, tab2, &buttonSetCloseCall);
   ESPUI.addControl(ControlType::Separator, "Motor Setting", "", ControlColor::Peterriver, tab2);
 
   Serial.println("travel_distance: ");
@@ -191,7 +192,7 @@ void ESPUIsetup() {
   ESPUI.addControl(ControlType::Separator, "Set Wifi", "", ControlColor::None, tab3);
   wifi_ssid_text = ESPUI.addControl(ControlType::Text, "Network", String(ssid), ControlColor::Emerald, tab3, &textNetworkCall);        //Text: Network
   wifi_pass_text = ESPUI.addControl(ControlType::Text, "Password", String(password), ControlColor::Emerald, tab3, &textPasswordCall);  //Text: Password
-  ESPUI.addControl(ControlType::Button, "Save Settings", "SAVE", ControlColor::Emerald, tab3, &buttonSaveNetworkCall);                 //Button: Save
+  ESPUI.addControl(ControlType::ButtonESPUI, "Save Settings", "SAVE", ControlColor::Emerald, tab3, &buttonSaveNetworkCall);                 //Button: Save
 
 
   //Tab4: API
