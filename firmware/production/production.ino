@@ -1,203 +1,66 @@
 #include <Arduino.h>
-#include <ESPUI.h>
-#include <ezTime.h>
-#include "FastAccelStepper.h"
-#include <HardwareSerial.h>
-#include <TMCStepper.h>
-#include <SPI.h>
-#include <Preferences.h>
-#include "Memory.h"
-#include "ResetButton.h"
-#include "MotorControl.h"
-#include "API.h"
-#include <EEPROM.h>
-#include "ESPUI.h"
+#include "memory.h"
+#include "motor_control.h"
+#include "api_settings.h"
+#include "espui_settings.h"
+#include <ArduinoOTA.h>  // For enabling over-the-air updates
 
 void setup() {
 
   Serial.begin(115200);
-  delay(1000);
+  Serial.println("BEGIN SETUP");
+
+  Serial1.begin(115200, SERIAL_8N1, RX_PIN, TX_PIN);  // ESP32 can use any pins to Serial
+
+  delay(100);
+
   preferences.begin("local", false);
   load_preferences();
   setup_motors();
-  setup_leds();
-  API();
+  setup_wifi();
   ESPUIsetup();
 
-  // Now set up tasks to run independently.
-  xTaskCreatePinnedToCore(
-    MotorTask //Motor Task
-    ,  "MotorTask"   // A name just for humans
-    ,  1024 * 4 // This stack size can be checked & adjusted by reading the Stack Highwater
-    ,  NULL
-    ,  3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-    ,  NULL
-    ,  1);
+  ArduinoOTA.begin();
 
-  xTaskCreatePinnedToCore(
-    ButtonTask //Motor Task
-    ,  "ButtonTask"   // A name just for humans
-    ,  1024 * 4 // This stack size can be checked & adjusted by reading the Stack Highwater
-    ,  NULL
-    ,  3  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-    ,  NULL
-    ,  0);
+  Serial.println("COMPLETE SETUP");
 }
 
-void loop()
-{
-  // Empty. Things are done in Tasks.
-}
+// Variables will change:
+int lastStateBtn1 = LOW;  // the previous state from the input pin
+int currentStateBtn1;     // the current reading from the input pin
+int lastStateBtn2 = LOW;  // the previous state from the input pin
+int currentStateBtn2;     // the current reading from the input pin
 
-/*--------------------------------------------------*/
-/*---------------------- Tasks ---------------------*/
-/*--------------------------------------------------*/
 
-void ButtonTask(void *pvParameters)  // Motor Task
-{
-  (void) pvParameters;
+void loop() {
+  dnsServer.processNextRequest();  // Process request for ESPUI
+  ArduinoOTA.handle();             // Handles a code update request
+  wifiResetButton();
 
-  for (;;)
-  {
+  // read the state of the switch/button:
+  currentStateBtn1 = digitalRead(BUTTON_1_PIN);
+  currentStateBtn2 = digitalRead(BUTTON_2_PIN);
 
-    if (btn1Press == 1) {
-
-      button1Timer = millis();
-      waitButton2Timer = millis() + 1000;
-
-      if (millis() < waitButton2Timer && btn2Press == 1 && motorRunning == false) {
-        Serial.println("START MOTOR CLOSE");
-        motorRunning = true;
-        
-        if (run_motor == true && move_to_step == max_steps){
-          stepper->forceStop();
-          move_to_step = 0;
-          stepper->moveTo(move_to_step);
-          }
-        
-        else if(run_motor == true && move_to_step == 0 )
-        {
-          stepper->forceStop();
-          delay(100);
-          move_to_step = stepper->getCurrentPosition();
-          stepper->moveTo(move_to_step);
-        }
-        else
-          {
-        move_to_step = 0;
-        run_motor = true;
-          }
-        }
-      
-      
-
-      if (brightness0 <= 255 && brightness0 >= 0) {
-        ledcWrite(0, brightness0); // set the brightness of the LED
-        brightness0 = brightness0 + fade0Amount;
-        vTaskDelay(30);
-      }
-
-      //Fade instead of turn off
-      if (brightness0 > 255) {
-        brightness0 = 255;
-        fade0Amount = -fade0Amount;
-      }
-
-      if (brightness0 < 0) {
-
-        brightness0 = 0;
-        ledcWrite(0, brightness0);
-        btn1Press = 0;
-        fade0Amount = 15;
-        motorRunning = false;
-      }
-    }
-
-    if (btn2Press == 1) {
-      button2Timer = millis();
-      waitButton1Timer = millis() + 1000;
-
-      if (millis() < waitButton1Timer && btn1Press == 1 && motorRunning == false ) {
-        Serial.println("START MOTOR OPEN");
-        motorRunning = true;
-        
-        if (run_motor == true && move_to_step == 0){
-          stepper->forceStop();
-          move_to_step = max_steps;
-          stepper->moveTo(move_to_step);
-          }
-        
-        else if(run_motor == true && move_to_step == max_steps )
-        {
-          stepper->forceStop();
-          delay(100);
-          move_to_step = stepper->getCurrentPosition();
-          stepper->moveTo(move_to_step);
-        }
-        else
-          {
-        move_to_step = max_steps;
-        run_motor = true;
-          }
-        }
-
-      if (brightness1 <= 255 && brightness1 >= 0) {
-        ledcWrite(1, brightness1); // set the brightness of the LED
-        brightness1 = brightness1 + fade1Amount;
-        vTaskDelay(30);
-      }
-
-      //Fade instead of turn off
-      if (brightness1 > 255) {
-        brightness1 = 255;
-        fade1Amount = -fade1Amount;
-      }
-
-      if (brightness1 < 0) {
-
-        brightness1 = 0;
-        ledcWrite(1, brightness1);
-        btn2Press = 0;
-        fade1Amount = 15;
-        motorRunning = false;
-      }
-    }
-
-    else
-    {
-      vTaskDelay(1);
+  if (lastStateBtn1 == HIGH && currentStateBtn1 == LOW) {
+    Serial.println("Btn1 is pressed");
+    if (is_moving) {
+      stop_flag = true;
+    } else {
+      move_to_percent100ths(0);
     }
   }
-}
 
-void MotorTask(void *pvParameters)  // Motor Task
-{
-  (void) pvParameters;
-
-  for (;;)
-  {
-
-    if (run_motor == true)
-    {
-      Serial.println("Run Motor Function");
-      move_motor();
-      run_motor = false;
-      ESPUI.updateLabel(positionLabel, String(int(((float)current_position / (float)max_steps) * 100)));
-      Serial.println("Motor Complete");
-    }
-    else if (set_zero == 1)
-    {
-      setZero();
-      set_zero = 0;
-    }
-    else if (wifi_button == true)
-    {
-      button_change();
-      wifi_button = false;
-    }
-    else
-    {
-      vTaskDelay(1);
+  if (lastStateBtn2 == HIGH && currentStateBtn2 == LOW) {
+    Serial.println("Btn2 is pressed");
+    if (is_moving) {
+      stop_flag = true;
+    } else {
+      move_to_percent100ths(100);
     }
   }
+
+  // save the the last state
+  lastStateBtn1 = currentStateBtn1;
+  lastStateBtn2 = currentStateBtn2;
+
 }
