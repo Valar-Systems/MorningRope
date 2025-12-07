@@ -15,10 +15,6 @@
 | Gear | 1 |MK7|
 | Bearing | 2 |7mm x 3mm x 3mm|
 
-### Mounting Hardware
-| Command strips | 2 | The easiest way to mount to any wall |
-|  #17 x 1 1/4" Wire Nail | 3| Use to nail to drywall only |
-
 ## Curtain Assembly
 
 | Part | Amount | Short Description |
@@ -31,7 +27,15 @@
 | V623ZZ Pulley | 1 | 3x12x4mm size|
 | Rope | 1 | 1.6mm diameter|
 
-## Asswmbly Tools Required
+### Mounting Hardware
+| Part | Amount | Short Description |
+| :--- | :---: | :---: |
+| Command strips | 2 | The easiest way to mount to any wall |
+|  #17 x 1 1/4" Wire Nail | 3| Use to nail to drywall only |
+
+## Assembly Tools Required
+| Part | Amount | Short Description |
+| :--- | :---: | :---: |
 | Razor | 1 | To cut the length of PTFE tubing|
 | Screw driver Phillips No. 1  | 1 ||
 | Hex driver 2mm | 1 ||
