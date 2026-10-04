@@ -7,6 +7,27 @@ The current hardware revision is **v1.1**. Print from [`hardware/plastics/v1.1`]
 
 The plastics changed slightly to suit the new tube lengths; otherwise assembly is the same.
 
+## Ceiling mounting for top mounted curtains
+
+For curtains on a ceiling-mounted track, print these two v1.2.2 parts in place of the standard pulley bottom and rope elbow top:
+
+- [End pulley bottom ceiling mount](plastics/v1.2.2/curtain/end-pulley-bottom-ceiling-mount.step)
+- [Rope elbow top ceiling mount](plastics/v1.2.2/curtain/rope-elbow-top-ceiling-mount.step)
+
+Print a matching spacer for each mount. Choose a thickness that positions the rope level with your curtain carriages. The [spacer generator](plastics/v1.2.2/curtain/make_mount_spacers.py) creates both spacer models as STEP and STL files; it needs Python with CadQuery installed. From the repository root, run for example:
+
+```sh
+python hardware/plastics/v1.2.2/curtain/make_mount_spacers.py 40mm
+```
+
+This writes `end-pulley-ceiling-spacer-40mm.step` / `.stl` and `rope-elbow-ceiling-spacer-40mm.step` / `.stl` in the curtain parts folder. You can also pass an inch value such as `1.5in`; omitting the value defaults to `1.5in`. If the two mounts need different spacer thicknesses, run the generator once for each size and print the matching spacer from each run.
+
+The holes were sized for #9 screws: 4.7 mm through the ceiling mounts and 5.0 mm through the spacers.
+
+Place each spacer between its mount and the ceiling. Screw the mounts through the spacers into ceiling framing (joists or studs); we recommend fastening into framing rather than drywall alone. Use screws long enough to reach the framing after passing through the mount and spacer.
+
+You may need to flip the carriages around to reach the screws that secure the rope, then route the rope "backwards" relative to the standard installation so you can screw it into the carriages.
+
 # Instructions
 Image build guide can be found [here](https://canva.link/tmpoyau5pfkddx3).\
 Video build guide can be found [here](https://youtu.be/uowt6jLxNso).\

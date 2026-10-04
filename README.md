@@ -60,6 +60,10 @@ The current revision is **v1.1**. Open the print plate at [hardware/plastics/v1.
 
 Either use the included foam mounting squares (recommended), small nails (for drywall only), or two screws/anchors. It's very easy to install.
 
+### Top mounted curtains
+
+We've developed a way to use Ropener with ceiling-mounted curtain tracks: print the [ceiling mount parts](hardware/plastics/v1.2.2/curtain) and the right size spacers, then screw the mounts through the spacers into the ceiling. We recommend fastening them into ceiling framing (joists or studs). See the [ceiling mounting instructions](hardware/README.md#ceiling-mounting-for-top-mounted-curtains) for the exact parts and spacer sizes.
+
 
 ## Sending commands
 

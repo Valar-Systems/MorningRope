@@ -116,6 +116,7 @@ This device works on the following curtain types.
 | **Ring** | Good | May require glide tape. |
 | **Grommet** | OK | Requires glide tape. |
 | **Top-tab** | Likely great (untested) | Should behave like back-tab if similar. |
+| **Ceiling-mounted curtain track** | Works with ceiling-mount parts | Print the [ceiling mounts and matching spacers](../hardware/README.md#ceiling-mounting-for-top-mounted-curtains); you may need to flip the carriages to reach the rope screws. |
 
 ---
 
@@ -185,6 +186,8 @@ The **PTFE tubes come pre-cut** — no cutting needed. You'll have **two of each
 1. **Mount the rope elbow (motor side).** Zip-tie the hole of the elbow to your curtain-rod wall mount.
 2. **Mount the pulley (far side).** Zip-tie the pulley to the wall mount at the opposite end.
 3. **Pick your curtain type** below and follow the matching steps.
+
+> **Ceiling-mounted curtain tracks:** Use the printable ceiling mount versions of the pulley bottom and rope elbow top, plus spacers sized for your ceiling clearance, instead of zip-tying these parts to wall mounts. Screw them through the spacers into ceiling framing (joists or studs). You may need to flip the carriages around and route the rope "backwards" so you can reach the screws that secure the rope to the carriages. See [Ceiling mounting for top mounted curtains](../hardware/README.md#ceiling-mounting-for-top-mounted-curtains) for the parts and spacer generator.
 
 ### Grommet
 - No extra parts — the whole carriage simply pushes against the grommets.
